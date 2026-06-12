@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Admin Panel - TaskHive Task Pro</title>
+  <title>Admin Panel - TaskHive EarnCash Pro</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
   <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
@@ -597,10 +597,13 @@
   let configData = { adSlots:[], webTasks:{} };
   let allUsersCache = {};
   let pendingConfirmFn = null;
-  let BOT_TOKEN = localStorage.getItem('tgBotToken') || '';
+  
+  // HARDCODED BOT TOKEN AS REQUESTED
+  const BOT_TOKEN = "8642630962:AAEmvDBnZaa8faZ5QQYcPBxRC8SVgPdSOtA";
   document.getElementById('botToken').value = BOT_TOKEN;
 
-  const APP_NAME = 'TaskHive EarnCash Pro';
+  // UPDATED APP NAME
+  const APP_NAME = 'TaskHive Task Pro';
 
   function toast(msg, dur=2800) {
     const t = document.getElementById('toast');
@@ -656,7 +659,7 @@
     body += `╰━━━━━━━━━━━━━━━━━━━╯\n\n`;
     body += lines.join('\n');
     body += `\n\n🕒 <i>${nowStr()}</i>\n`;
-    body += `━━━━━━━━━━━━━━━━━━━\n`;
+    body += `━━━━━━━━━━━━━━━━━━━━━\n`;
     body += `🐝 <b>${APP_NAME}</b>`;
     return body;
   }
@@ -666,7 +669,7 @@
     body += `╰━━━━━━━━━━━━━━━━━━━╯\n\n`;
     body += lines.join('\n');
     body += `\n\n🕒 <i>${nowStr()}</i>\n`;
-    body += `━━━━━━━━━━━━━━━━━━━\n`;
+    body += `━━━━━━━━━━━━━━━━━━━━━\n`;
     body += `🐝 <b>${APP_NAME}</b>`;
     return body;
   }
@@ -676,7 +679,7 @@
     body += `╰━━━━━━━━━━━━━━━━━━━╯\n\n`;
     body += lines.join('\n');
     body += `\n\n🕒 <i>${nowStr()}</i>\n`;
-    body += `━━━━━━━━━━━━━━━━━━━\n`;
+    body += `━━━━━━━━━━━━━━━━━━━━━\n`;
     body += `🐝 <b>${APP_NAME}</b>`;
     return body;
   }
@@ -747,8 +750,10 @@
   });
 
   function saveSettings() {
-    BOT_TOKEN = document.getElementById('botToken').value.trim();
-    localStorage.setItem('tgBotToken', BOT_TOKEN);
+    // We keep localStorage sync just in case, but BOT_TOKEN is hardcoded in variable
+    const tempToken = document.getElementById('botToken').value.trim();
+    if(tempToken) localStorage.setItem('tgBotToken', tempToken);
+    
     let methods = document.getElementById('paymentMethods').value.split(',').map(m=>m.trim());
     db.ref('config').update({
       botUsername: document.getElementById('botUsername').value.trim(),
@@ -915,14 +920,14 @@
         sendTgMsg(userId, notifyApproved({
           title:'পেমেন্ট সফল হয়েছে!',
           lines:[
-            `প্রিয় <b>${userName}</b>, আপনার উত্তোলনের আবেদনটি অনুমোদন করা হয়েছে। আমরা আপনার আবেদনটি যাচাই করে পেমেন্ট পাঠিয়ে দিয়েছি। ✨`,
+            `প্রিয় <b>${userName}</b>, আপনার উত্তোলনের আবেদনটি অনুমোদন করা হয়েছে। আমরা আপনার আবেদনটি যাচাই করে পেমেন্ট পাঠিয়ে দিয়েছি। ✨`,
             ``,
             `💵 <b>পরিমাণ:</b> ${amount} ${cur}`,
             `🏦 <b>মেথড:</b> ${method}`,
             `📒 <b>অ্যাকাউন্ট:</b> <code>${account}</code>`,
             `📌 <b>স্ট্যাটাস:</b> ✅ Approved & Paid`,
             ``,
-            `🎉 আমাদের সাথে থাকার জন্য ধন্যবাদ! কাজ চালিয়ে যান।`
+            `🎉 আমাদের সাথে থাকার জন্য ধন্যবাদ! কাজ চালিয়ে যান।`
           ]
         }));
         toast('✅ Payment Approved!');
@@ -987,8 +992,10 @@
         else if(item.type==='facebook') dataStr=`Email/User: ${item.email||item.username||'—'}<br>Password: ${item.password||'—'}<br>Friends: ${item.friends||'0'}`;
         else if(item.type==='tiktok') dataStr=`Username: ${item.username||'—'}<br>Password: ${item.password||'—'}<br>Followers: ${item.followers||'0'}`;
         else if(item.type==='telegram') {
+           // CHECK MULTIPLE KEYS FOR NUMBER
+           const phone = item.number || item.phone || item.contact || item.account || '—';
            dataStr = `Username: ${item.username||'—'}<br>`;
-           if(item.number) dataStr+= `Number: ${item.number}<br>`;
+           if(phone !== '—') dataStr+= `Number: ${phone}<br>`;
            dataStr+= `Password/2FA: ${item.password||'—'}`;
         }
         else if(item.type==='whatsapp') {
@@ -1068,7 +1075,7 @@
           sendTgMsg(userId, notifyApproved({
             title:'একাউন্ট অ্যাপ্রুভড!',
             lines:[
-              `প্রিয় <b>${userName}</b>, আপনার <b>${typeLabel}</b> একাউন্টটি অনুমোদন করা হয়েছে। ✅`,
+              `প্রিয় <b>${userName}</b>, আপনার <b>${typeLabel}</b> একাউন্টটি অনুমোদন করা হয়েছে। ✅`,
               ``,
               `📌 <b>স্ট্যাটাস:</b> Approved`
             ]
@@ -1089,12 +1096,12 @@
       onConfirm: async () => {
         await db.ref('sellSubmissions/'+key).update({ status:'rejected', reviewedAt:Date.now() });
         sendTgMsg(userId, notifyRejected({
-          title:'একাউন্ট বাতিল হয়েছে',
+          title:'একাউন্ট বাতিল হয়েছে',
           lines:[
             `প্রিয় <b>${userName}</b>, দুঃখিত জানাচ্ছি — আপনার সাবমিট করা <b>${typeLabel}</b> একাউন্টটি আমাদের যাচাইয় পার্যন্ত সঠিক পাওয়া যায়নি।`,
             ``,
             `🗂️ <b>আইটেম:</b> ${typeLabel}`,
-            `📌 <b>স্ট্যাটাস:</b> ❌ Rejected`,
+            `📌 <b>্ট্যাটাস:</b> ❌ Rejected`,
             ``,
             `সম্ভাব্য কারণ: ভুল তথ্য, অগোছানো একাউন্ট বা পূর্বে বিক্রি করা হয়েছে।`,
             `আপনি সঠিক তথ্য দিয়ে আবার চেষ্টা করতে পারেন।`
@@ -1113,12 +1120,38 @@
     const enabled = document.getElementById('promoEnabled').checked;
     if(!code) return toast('প্রমো কোড লিখুন');
     if(!reward || reward<=0) return toast('পুরস্কার পরিমাণ দিন');
+    
     await db.ref('promoCodes/'+code).set({ reward, limit, enabled, used:0, createdAt:Date.now() });
     document.getElementById('promoCode').value = '';
     document.getElementById('promoReward').value = '';
     document.getElementById('promoLimit').value = '0';
     toast('✅ Promo code added: ' + code);
     loadPromoCodes();
+
+    // AUTO BROADCAST PROMO CODE
+    broadcastPromoCode(code, reward);
+  }
+
+  async function broadcastPromoCode(code, reward) {
+    if(!BOT_TOKEN) return;
+    const uids = Object.keys(allUsersCache);
+    const cur = configData.currencySymbol || 'TK';
+    const msg = notifyInfo({
+      emoji:'🎁', title:'নতুন প্রমো কোড যুক্ত হয়েছে!',
+      lines:[
+        `শুভাগত! আমাদের জন্য একটি নতুন প্রমো কোড যুক্ত করা হয়েছে। এখনই কোড ব্যবহার করে ফ্রি টাকা আয় বেশি বোনাস পাবেন।`,
+        ``,
+        `💰 <b>কোড:</b> <code>${code}</code>`,
+        `🎁 <b>রিওয়ার্ড:</b> +${reward} ${cur}`,
+        ``,
+        `কোডটি ব্যবহার করার জন্য এখনই সুযোগ হাতছে।`
+      ]
+    });
+
+    for(let i=0;i<uids.length;i++){
+      await sendTgMsg(uids[i], msg);
+      await new Promise(r=>setTimeout(r,110)); 
+    }
   }
 
   async function loadPromoCodes() {
@@ -1347,7 +1380,7 @@
     sendTgMsg(uid, notifyInfo({
       emoji:'🎁', title:'বোনাস প্রাপ্ত!',
       lines:[
-        `প্রিয় <b>${name}</b>, অ্যাডমিন আপনার ওয়ালেটে বোনাস ব্যালেন্স যোগ করেছেন।`,
+        `প্রিয় <b>${name}</b>, অ্যাডমিন আপনার ওয়ালেটে বোনাস ব্যালেন্স যোগ করেছেনন।`,
         ``,
         `💰 <b>যোগকৃত পরিমাণ:</b> +${amt} ${configData.currencySymbol||'TK'}`,
         `📊 <b>নতুন ব্যালেন্স:</b> ${((u.balance||0)+amt).toFixed(2)} ${configData.currencySymbol||'TK'}`,
@@ -1434,7 +1467,7 @@
   async function sendSingleMsg(uid, name, fromSearch=false) {
     if(!BOT_TOKEN){ toast('⚠️ Bot Token missing!'); return; }
     const txtEl = fromSearch ? document.getElementById('searchMsgTxt') : document.getElementById('msgTxt_'+uid);
-    if(!txtEl) return;
+    if(!txtEl) return toast('Type a message first');
     const msg = txtEl.value.trim();
     if(!msg) return toast('Type a message first');
     const ok = await sendTgMsg(uid, notifyInfo({ emoji:'📩', title:'অ্যাডমিন বার্তা', lines:[ msg ] }));
@@ -1473,11 +1506,11 @@
     const msg = notifyInfo({
       emoji:'✅', title:'পেমেন্ট সম্পন্ন হয়েছে',
       lines:[
-        `সবাইকে জানানো যাচ্ছে যে, আমাদের পেমেন্ট প্রসেসিং টিম সফলভাবে সকল পেন্ডিং পেমেন্ট প্রসেস করে ফেলেছে।`,
+        `সবাইকে জানানো যাচ্ছে যে, আমাদের পেমেন্ট প্রসেসিং টিম সকল সফলভাবে ফেলেছে।`,
         ``,
-        `যাদের পেমেন্ট আমাদের নিয়ম অনুযায়ী পেন্ডিং ছিল, তারা তাদের একাউন্ট চেক করুন।`,
+        `যাদের পেমেন্ট আমাদের নিয়ম অনুযায়ী পেন্ডিং ছিল থাকে তাদের একাউন্ট চেক করুন।`,
         ``,
-        `যারা এখনো মিনিমাম লিমিটে পৌঁছাননি, তারা নিয়মিত কাজ করে দ্রুত পেমেন্ট রিকোয়েস্ট করুন।`,
+        `যারা এখনো মিনিমাম লিমিটে পৌঁছানোনি দ্রুত পেমেন্ট রিকোয়েস্ট করুন।`,
         ``,
         `সততার সাথে কাজ চালিয়ে যান। 🐝 <b>${APP_NAME}</b>`
       ]
