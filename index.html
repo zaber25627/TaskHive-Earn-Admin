@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Admin Panel - TaskHive EarnCash Pro</title>
+  <title>Admin Panel - TaskHive Task Pro</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
   <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
@@ -92,18 +92,18 @@
     .ic-orange{background:rgba(246,176,74,.15);color:var(--warn);}
     .ic-red{background:rgba(255,71,87,.15);color:var(--danger);}
     .ic-teal{background:rgba(0,206,201,.15);color:#00cec9;}
+    .ic-pink{background:rgba(253,29,29,.13);color:#fd1d1d;}
 
-    /* ========= SELL SUBMISSIONS ========= */
-    .sell-sub-item{border:1px solid var(--border);padding:14px;border-radius:14px;margin-bottom:12px;background:rgba(255,255,255,.03);}
-    .sell-sub-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
-    .sell-sub-type{font-weight:800;font-size:.88rem;color:var(--primary-light);}
-    .sell-sub-status{font-size:.73rem;font-weight:800;padding:3px 10px;border-radius:99px;}
-    .sell-sub-status.pending{background:rgba(246,176,74,.2);color:var(--warn);}
-    .sell-sub-status.done{background:rgba(0,214,143,.15);color:var(--success);}
-    .sell-sub-data{font-size:.82rem;color:var(--text-muted);font-weight:600;margin-bottom:10px;line-height:1.7;word-break:break-all;}
-    .sell-sub-actions{display:flex;gap:8px;}
+    /* ========= SELL SUBMISSIONS (NEW STYLE LIKE WITHDRAWALS) ========= */
+    .sell-sub-card{border:1px solid var(--border);padding:16px;border-radius:16px;margin-bottom:14px;background:rgba(255,255,255,.03);}
+    .sell-sub-head{display:flex;justify-content:space-between;align-items:center;font-weight:800;margin-bottom:11px;border-bottom:1px solid var(--border);padding-bottom:11px;}
+    .sell-sub-info{font-size:.86rem;color:var(--text-muted);margin-bottom:14px;line-height:1.7;}
+    .sell-sub-actions{display:flex;gap:9px;}
+    .badge-type{color:#fab1a0;background:rgba(253,203,110,.15);padding:5px 12px;border-radius:9px;font-size:.8rem;font-weight:800;}
+    .badge-price{color:var(--primary-light);font-size:1.1rem;font-weight:900;}
 
-    /* ========= SELL SETTINGS - 4 ITEMS ========= */
+
+    /* ========= SELL SETTINGS - ITEMS ========= */
     .sell-item-card{
       background:rgba(255,255,255,.03);border:1px solid var(--border);
       border-radius:16px;padding:16px;margin-bottom:14px;
@@ -185,6 +185,8 @@
     .logo-instagram{background:linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045);color:#fff;}
     .logo-facebook{background:linear-gradient(135deg,rgba(24,119,242,.3),rgba(24,119,242,.15));color:#1877F2;}
     .logo-tiktok{background:linear-gradient(135deg,rgba(0,0,0,.6),rgba(105,201,208,.2));color:#69C9D0;}
+    .logo-telegram{background:linear-gradient(135deg,rgba(0,136,204,.25),rgba(0,136,204,.12));color:#0088cc;}
+    .logo-whatsapp{background:linear-gradient(135deg,rgba(37,211,102,.22),rgba(37,211,102,.12));color:#25D366;}
   </style>
 </head>
 <body>
@@ -331,6 +333,10 @@
         <div class="stat-card"><div class="stat-icon ic-red"><i class="fas fa-times-circle"></i></div><div class="stat-val" id="st-wdRejected">—</div><div class="stat-label">Rejected Payouts</div></div>
         <div class="stat-card"><div class="stat-icon ic-purple"><i class="fas fa-list-check"></i></div><div class="stat-val" id="st-tasks">—</div><div class="stat-label">Tasks Completed</div></div>
         <div class="stat-card"><div class="stat-icon ic-teal"><i class="fas fa-play-circle"></i></div><div class="stat-val" id="st-ads">—</div><div class="stat-label">Ads Watched</div></div>
+        <!-- NEW: Sell Accepted -->
+        <div class="stat-card"><div class="stat-icon ic-green"><i class="fas fa-store"></i></div><div class="stat-val" id="st-sellAccepted">—</div><div class="stat-label">Sell Accepted</div><div class="stat-sub" id="st-sellAcceptedAmt" style="color:var(--success);">0 TK</div></div>
+        <!-- NEW: Sell Cancelled -->
+        <div class="stat-card"><div class="stat-icon ic-pink"><i class="fas fa-store-slash"></i></div><div class="stat-val" id="st-sellRejected">—</div><div class="stat-label">Sell Cancelled</div><div class="stat-sub" id="st-sellPending" style="color:var(--warn);">0 Pending</div></div>
       </div>
       <div class="card">
         <h3><i class="fas fa-sync-alt"></i> Live Data</h3>
@@ -348,12 +354,28 @@
           <div style="text-align:center;padding:24px;color:var(--text-muted);"><i class="fas fa-spinner fa-spin" style="font-size:1.5rem;"></i><br><br>Loading...</div>
         </div>
       </div>
+      <!-- NEW: Payment Completed Broadcast -->
+      <div class="card">
+        <h3><i class="fas fa-bullhorn"></i> Bulk Notice</h3>
+        <p style="font-size:.8rem;color:var(--text-muted);margin-bottom:14px;">Send a notification to all users stating that payments are completed and they should keep working.</p>
+        <button class="btn btn-green" onclick="sendPaymentCompleteMsg()"><i class="fas fa-check-double"></i> Send "Payments Completed" Notice</button>
+      </div>
     </div>
 
-    <!-- ===================== SELL SETTINGS ===================== -->
+    <!-- ===================== SELL REQUESTS (NEW STYLE) ===================== -->
     <div id="tab-sell" class="tab-content">
+      
+      <!-- Sale Submissions (Live View) -->
+      <div class="card">
+        <h3><i class="fas fa-inbox"></i> Pending Sell Requests</h3>
+        <p style="font-size:.8rem;color:var(--text-muted);margin-bottom:14px;">Approve or reject submissions below. Action items will disappear automatically.</p>
+        
+        <div id="sellSubContainer">
+          <div style="text-align:center;padding:24px;color:var(--text-muted);"><i class="fas fa-spinner fa-spin" style="font-size:1.5rem;"></i><br><br>Loading...</div>
+        </div>
+      </div>
 
-      <!-- 4 Sell Items Settings -->
+      <!-- Sell Settings (Moved below for better flow) -->
       <div class="card">
         <h3><i class="fas fa-store"></i> Account Sale Settings</h3>
         <p style="font-size:.8rem;color:var(--text-muted);margin-bottom:16px;">প্রতিটি আইটেমের দাম ও চালু/বন্ধ অবস্থা আলাদাভাবে সেট করুন।</p>
@@ -434,19 +456,45 @@
           </div>
         </div>
 
-        <button class="btn btn-green" style="margin-top:6px;" onclick="saveSellSettings()"><i class="fas fa-save"></i> Save All Sale Settings</button>
-      </div>
-
-      <!-- Sale Submissions -->
-      <div class="card">
-        <h3><i class="fas fa-inbox"></i> Sale Submissions</h3>
-        <p style="font-size:.8rem;color:var(--text-muted);margin-bottom:14px;">ইউজারদের পাঠানো একাউন্ট সাবমিশন</p>
-        <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
-          <button class="btn btn-small" onclick="loadSellSubmissions('pending')" style="flex:1;">⏳ Pending</button>
-          <button class="btn btn-small btn-green" onclick="loadSellSubmissions('done')" style="flex:1;">✅ Done</button>
-          <button class="btn btn-small btn-orange" onclick="loadSellSubmissions('all')" style="flex:1;">সব দেখুন</button>
+        <!-- Telegram -->
+        <div class="sell-item-card">
+          <div class="sell-item-header">
+            <div class="sell-item-logo logo-telegram"><i class="fab fa-telegram-plane"></i></div>
+            <div class="sell-item-info">
+              <div class="sell-item-name">Telegram ID</div>
+              <div class="sell-item-desc">Telegram একাউন্ট বিক্রির সেটিং</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="telegramEnabled" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="form-group" style="margin:0;">
+            <label>Telegram ID প্রতি মূল্য (TK)</label>
+            <input type="number" id="telegramPrice" placeholder="e.g. 35">
+          </div>
         </div>
-        <div id="sellSubContainer"><div style="text-align:center;color:var(--text-muted);padding:20px;"><i class="fas fa-spinner fa-spin"></i></div></div>
+
+        <!-- WhatsApp -->
+        <div class="sell-item-card">
+          <div class="sell-item-header">
+            <div class="sell-item-logo logo-whatsapp"><i class="fab fa-whatsapp"></i></div>
+            <div class="sell-item-info">
+              <div class="sell-item-name">WhatsApp ID</div>
+              <div class="sell-item-desc">WhatsApp একাউন্ট বিক্রির সেটিং</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="whatsappEnabled" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="form-group" style="margin:0;">
+            <label>WhatsApp ID প্রতি মূল্য (TK)</label>
+            <input type="number" id="whatsappPrice" placeholder="e.g. 30">
+          </div>
+        </div>
+
+        <button class="btn btn-green" style="margin-top:6px;" onclick="saveSellSettings()"><i class="fas fa-save"></i> Save All Sale Settings</button>
       </div>
     </div>
 
@@ -495,11 +543,12 @@
       </div>
       <div class="card">
         <h3><i class="fas fa-plus-circle"></i> Add New Task</h3>
+        <p style="font-size:.75rem;color:var(--success);margin-bottom:10px;"><i class="fas fa-info-circle"></i> নোট: নতুন টাস্ক অ্যাড করলে সব ইউজারের কাছে অটোমেটিক নোটিফিকেশন চলে যাবে।</p>
         <div class="form-group"><label>Task Name</label><input type="text" id="taskName" placeholder="Subscribe Channel"></div>
         <div class="form-group"><label>Reward Amount</label><input type="number" id="taskReward" placeholder="5"></div>
         <div class="form-group"><label>Action URL</label><input type="text" id="taskUrl" placeholder="https://t.me/..."></div>
         <div class="form-group"><label>Icon Image URL (optional)</label><input type="text" id="taskIcon" placeholder="https://.../icon.png"></div>
-        <button class="btn btn-green" onclick="addTask()"><i class="fas fa-plus"></i> Add Task</button>
+        <button class="btn btn-green" onclick="addTask()"><i class="fas fa-plus"></i> Add Task & Notify All</button>
       </div>
       <div class="card">
         <h3><i class="fas fa-list-check"></i> Existing Tasks</h3>
@@ -547,10 +596,11 @@
 
   let configData = { adSlots:[], webTasks:{} };
   let allUsersCache = {};
-  let activeTargetUser = null;
   let pendingConfirmFn = null;
   let BOT_TOKEN = localStorage.getItem('tgBotToken') || '';
   document.getElementById('botToken').value = BOT_TOKEN;
+
+  const APP_NAME = 'TaskHive EarnCash Pro';
 
   function toast(msg, dur=2800) {
     const t = document.getElementById('toast');
@@ -581,7 +631,8 @@
     el.classList.add('active');
     document.getElementById('tab-' + id).classList.add('active');
     if(id === 'stats') loadStats();
-    if(id === 'sell') { loadSellSubmissions('pending'); loadSellSettings(); }
+    // SELL SETTINGS NOW LOADED ONLY, LISTENER IS GLOBAL
+    if(id === 'sell') loadSellSettings(); 
     if(id === 'promo') loadPromoCodes();
   }
 
@@ -594,6 +645,40 @@
       });
       return res.ok;
     } catch(e){ return false; }
+  }
+
+  // ===== Professional Notification Templates =====
+  function nowStr(){ return new Date().toLocaleString('en-GB',{hour12:true}); }
+  function notifyApproved({title, lines}){
+    const cur = configData.currencySymbol || 'TK';
+    let body = `╭━━━━━━━━━━━━━━━━━━━╮\n`;
+    body += `   ✅ <b>${title}</b>\n`;
+    body += `╰━━━━━━━━━━━━━━━━━━━╯\n\n`;
+    body += lines.join('\n');
+    body += `\n\n🕒 <i>${nowStr()}</i>\n`;
+    body += `━━━━━━━━━━━━━━━━━━━\n`;
+    body += `🐝 <b>${APP_NAME}</b>`;
+    return body;
+  }
+  function notifyRejected({title, lines}){
+    let body = `╭━━━━━━━━━━━━━━━━━━━╮\n`;
+    body += `   ❌ <b>${title}</b>\n`;
+    body += `╰━━━━━━━━━━━━━━━━━━━╯\n\n`;
+    body += lines.join('\n');
+    body += `\n\n🕒 <i>${nowStr()}</i>\n`;
+    body += `━━━━━━━━━━━━━━━━━━━\n`;
+    body += `🐝 <b>${APP_NAME}</b>`;
+    return body;
+  }
+  function notifyInfo({emoji, title, lines}){
+    let body = `╭━━━━━━━━━━━━━━━━━━━╮\n`;
+    body += `   ${emoji} <b>${title}</b>\n`;
+    body += `╰━━━━━━━━━━━━━━━━━━━╯\n\n`;
+    body += lines.join('\n');
+    body += `\n\n🕒 <i>${nowStr()}</i>\n`;
+    body += `━━━━━━━━━━━━━━━━━━━\n`;
+    body += `🐝 <b>${APP_NAME}</b>`;
+    return body;
   }
 
   db.ref('config').on('value', snap => {
@@ -656,6 +741,7 @@
     loadPromoCodes();
   });
 
+  // Global listener for Users
   db.ref('users').on('value', snap => {
     if(snap.exists()){ allUsersCache = snap.val(); renderUsersList(); }
   });
@@ -706,10 +792,40 @@
       icon: document.getElementById('taskIcon').value.trim() || 'https://via.placeholder.com/45'
     };
     if(!data.name||!data.url||!data.reward) return toast('⚠️ Fill all required fields');
-    db.ref('config/webTasks/task_' + Date.now()).set(data).then(() => {
+    
+    const taskId = 'task_' + Date.now();
+    
+    db.ref('config/webTasks/'+taskId).set(data).then(() => {
       toast('✅ Task Added!');
       ['taskName','taskReward','taskUrl','taskIcon'].forEach(id => document.getElementById(id).value='');
+
+      // AUTO BROADCAST NEW TASK
+      broadcastNewTask(data);
     });
+  }
+
+  async function broadcastNewTask(taskData) {
+    if(!BOT_TOKEN) return;
+    const uids = Object.keys(allUsersCache);
+    const cur = configData.currencySymbol || 'TK';
+    const msg = notifyInfo({
+      emoji:'🆕', title:'নতুন টাস্ক যুক্ত হয়েছে!',
+      lines:[
+        `আপনার জন্য নতুন একটি টাস্ক যুক্ত করা হয়েছে। দ্রুত সম্পন্ন করে রিওয়ার্ড আয় করুন।`,
+        ``,
+        `📝 <b>টাস্ক:</b> ${taskData.name}`,
+        `💰 <b>রিওয়ার্ড:</b> +${taskData.reward} ${cur}`,
+        `🔗 <b>লিংক:</b> ${taskData.url}`,
+        ``,
+        `সুযোগ হাতছাড়ি করবেন না! কাজ শুরু করুন।`
+      ]
+    });
+
+    for(let i=0;i<uids.length;i++){
+      await sendTgMsg(uids[i], msg);
+      await new Promise(r=>setTimeout(r,100)); 
+    }
+    toast(`📢 Task broadcasted to ${uids.length} users`);
   }
 
   function deleteTask(id) {
@@ -727,6 +843,8 @@
     });
     document.getElementById('st-tasks').innerText = totalTasks;
     document.getElementById('st-ads').innerText = totalAds;
+
+    // Withdrawal stats
     db.ref('withdrawals').once('value', snap => {
       let approved=0, pending=0, rejected=0, approvedAmt=0, pendingAmt=0;
       if(snap.exists()){ snap.forEach(child => { const w = child.val(); if(w.status==='approved'||w.status==='completed'){ approved++; approvedAmt+=Number(w.amount||0); } else if(w.status==='pending'){ pending++; pendingAmt+=Number(w.amount||0); } else if(w.status==='rejected'){ rejected++; } }); }
@@ -736,8 +854,26 @@
       document.getElementById('st-wdApprovedAmt').innerText = approvedAmt.toFixed(2)+' '+cur;
       document.getElementById('st-wdPendingAmt').innerText = pendingAmt.toFixed(2)+' '+cur;
     });
+
+    // NEW: Sell stats (Accepted / Rejected / Pending)
+    db.ref('sellSubmissions').once('value', snap => {
+      let accepted=0, rejected=0, pending=0, acceptedAmt=0;
+      if(snap.exists()){
+        snap.forEach(child => {
+          const s = child.val();
+          if(s.status==='done'){ accepted++; acceptedAmt += getItemPrice(s.type); }
+          else if(s.status==='rejected'){ rejected++; }
+          else { pending++; }
+        });
+      }
+      document.getElementById('st-sellAccepted').innerText = accepted;
+      document.getElementById('st-sellAcceptedAmt').innerText = acceptedAmt.toFixed(2)+' '+cur;
+      document.getElementById('st-sellRejected').innerText = rejected;
+      document.getElementById('st-sellPending').innerText = pending+' Pending';
+    });
   }
 
+  // WITHDRAWAL LISTENER
   db.ref('withdrawals').orderByChild('status').equalTo('pending').on('value', snap => {
     let html = '';
     if(snap.exists()){
@@ -773,9 +909,22 @@
       msg:`Approve for ${userName} via ${method}?`,
       btnLabel:'<i class="fas fa-check"></i> Approve', btnClass:'btn-green',
       onConfirm: async () => {
+        const cur = configData.currencySymbol||'TK';
         await db.ref('withdrawals/'+key).update({ status:'approved' });
         await db.ref('users/'+userId+'/withdrawHistory/'+key).update({ status:'approved' });
-        sendTgMsg(userId, `✅ <b>Payment Approved!</b>\n━━━━━━━━━━━━━━━━━\nপেমেন্ট: <b>${amount} ${configData.currencySymbol||'TK'}</b>\nমেথড: ${method}\nঅ্যাকাউন্ট: ${account}\n\n<i>TaskHive EarnCash Pro</i>`);
+        sendTgMsg(userId, notifyApproved({
+          title:'পেমেন্ট সফল হয়েছে!',
+          lines:[
+            `প্রিয় <b>${userName}</b>, আপনার উত্তোলনের আবেদনটি অনুমোদন করা হয়েছে। আমরা আপনার আবেদনটি যাচাই করে পেমেন্ট পাঠিয়ে দিয়েছি। ✨`,
+            ``,
+            `💵 <b>পরিমাণ:</b> ${amount} ${cur}`,
+            `🏦 <b>মেথড:</b> ${method}`,
+            `📒 <b>অ্যাকাউন্ট:</b> <code>${account}</code>`,
+            `📌 <b>স্ট্যাটাস:</b> ✅ Approved & Paid`,
+            ``,
+            `🎉 আমাদের সাথে থাকার জন্য ধন্যবাদ! কাজ চালিয়ে যান।`
+          ]
+        }));
         toast('✅ Payment Approved!');
       }
     });
@@ -788,239 +937,89 @@
       msg:`Reject withdrawal request for ${userName}? Amount will be refunded.`,
       btnLabel:'<i class="fas fa-times"></i> Reject', btnClass:'btn-red',
       onConfirm: async () => {
+        const cur = configData.currencySymbol||'TK';
         await db.ref('withdrawals/'+key).update({ status:'rejected' });
         await db.ref('users/'+userId+'/withdrawHistory/'+key).update({ status:'rejected' });
         const snap = await db.ref('users/'+userId).once('value');
         if(snap.exists()){ const u = snap.val(); await db.ref('users/'+userId).update({ balance:(u.balance||0)+Number(amount), totalWithdrawn:Math.max(0,(u.totalWithdrawn||0)-Number(amount)) }); }
-        sendTgMsg(userId, `❌ <b>Request Rejected</b>\n━━━━━━━━━━━━━━━━━\nপরিমাণ <b>${amount} ${configData.currencySymbol||'TK'}</b> আপনার ব্যালেন্সে ফেরত দেওয়া হয়েছে।\n\n<i>TaskHive EarnCash Pro</i>`);
+        sendTgMsg(userId, notifyRejected({
+          title:'উত্তোলন বাতিল হয়েছে',
+          lines:[
+            `প্রিয় <b>${userName}</b>, দুঃখিত জানাচ্ছি — আপনার উত্তোলনের আবেদনটি আমাদের নিয়মাবলীর কারণে বাতিল করা হয়েছে।`,
+            ``,
+            `💵 <b>পরিমাণ:</b> ${amount} ${cur}`,
+            `♻️ <b>রিফান্ড:</b> সম্পূর্ণ পরিমাণ আপনার ব্যালেন্সে ফেরত দেওয়া হয়েছে।`,
+            `📌 <b>স্ট্যাটাস:</b> ❌ Rejected`,
+            ``,
+            `বিস্তারিত জানতে সাপোর্টে যোগাযোগ করুন।`
+          ]
+        }));
         toast('❌ Request Rejected & Amount Refunded');
       }
     });
   }
 
-  function renderUsersList() {
-    const el = document.getElementById('usersList');
-    const msg = document.getElementById('usersLoadingMsg');
-    const cur = configData.currencySymbol || 'TK';
-    const users = Object.values(allUsersCache);
-    if(!users.length){ msg.style.display='block'; msg.innerHTML='No users found.'; return; }
-    msg.style.display='none';
+  // ======================= SELL SUBMISSIONS LISTENER (LIKE WITHDRAWALS) =======================
+  db.ref('sellSubmissions').orderByChild('status').equalTo('pending').on('value', snap => {
     let html = '';
-    users.slice(0,50).forEach(u => {
-      const initial = (u.name||'?')[0].toUpperCase();
-      html += `
-      <div class="user-list-item">
-        <div class="user-list-head">
-          <div class="user-avatar">${initial}</div>
-          <div><div class="user-list-name">${u.name||'Unknown'}</div><div class="user-list-id">ID: ${u.id}</div></div>
-          ${u.isBanned ? '<span style="background:rgba(255,71,87,.2);color:var(--danger);font-size:.72rem;font-weight:800;padding:3px 10px;border-radius:99px;margin-left:auto;">BANNED</span>' : ''}
-        </div>
-        <div class="user-stats-row">
-          <div class="user-stat-chip"><div class="chip-val">${(u.balance||0).toFixed(1)}</div><div>${cur}</div></div>
-          <div class="user-stat-chip"><div class="chip-val">${u.referrals||0}</div><div>Refs</div></div>
-          <div class="user-stat-chip"><div class="chip-val">${(u.totalEarned||0).toFixed(1)}</div><div>Earned</div></div>
-          <div class="user-stat-chip"><div class="chip-val">${(u.totalWithdrawn||0).toFixed(1)}</div><div>Withdrawn</div></div>
-        </div>
-        <div class="user-actions-area">
-          <div class="user-action-row">
-            <input type="number" id="addBal_${u.id}" placeholder="Add balance" style="flex:1;">
-            <button class="btn btn-green btn-small" onclick="addBalance('${u.id}','${u.name||'User'}')"><i class="fas fa-plus"></i> Add</button>
-          </div>
-          <div class="user-action-row">
-            ${u.isBanned
-              ? `<button class="btn btn-green btn-small" style="flex:1;" onclick="unbanUser('${u.id}')"><i class="fas fa-unlock"></i> Unban</button>`
-              : `<button class="btn btn-red btn-small" style="flex:1;" onclick="banUser('${u.id}','${u.name||'User'}')"><i class="fas fa-ban"></i> Ban</button>`
-            }
-            <button class="btn btn-small" style="flex:1;background:rgba(255,255,255,.08);box-shadow:none;" onclick="resetUser('${u.id}','${u.name||'User'}')"><i class="fas fa-redo"></i> Reset Balance</button>
-          </div>
-          <textarea id="msgTxt_${u.id}" rows="2" placeholder="Message to user..." style="margin-top:8px;font-size:.82rem;"></textarea>
-          <button class="btn btn-small" style="width:100%;margin-top:6px;background:linear-gradient(135deg,#0984e3,#74b9ff);box-shadow:none;" onclick="sendSingleMsg('${u.id}','${u.name||'User'}')"><i class="fas fa-paper-plane"></i> Send Message</button>
-        </div>
-      </div>`;
-    });
-    el.innerHTML = html;
-  }
-
-  function searchUser() {
-    const uid = document.getElementById('searchUid').value.trim();
-    const box = document.getElementById('userResultBox');
-    if(!uid) return toast('Enter a User ID');
-    const u = allUsersCache[uid];
-    if(!u){ box.style.display='block'; box.innerHTML='<p style="color:var(--danger);text-align:center;padding:10px;">User not found.</p>'; return; }
     const cur = configData.currencySymbol || 'TK';
-    box.style.display='block';
-    box.innerHTML = `
-      <div style="border:1px solid var(--border);border-radius:14px;padding:14px;margin-top:10px;">
-        <div style="font-weight:800;font-size:1rem;color:#fff;margin-bottom:8px;">${u.name||'Unknown'} <span style="color:var(--text-muted);font-weight:600;font-size:.8rem;">(${u.id})</span></div>
-        <div style="font-size:.82rem;color:var(--text-muted);line-height:1.8;">Balance: <b style="color:var(--success);">${(u.balance||0).toFixed(2)} ${cur}</b><br>Earned: ${(u.totalEarned||0).toFixed(2)} ${cur}<br>Referrals: ${u.referrals||0}<br>Withdrawn: ${(u.totalWithdrawn||0).toFixed(2)} ${cur}${u.isBanned ? '<br><span style="color:var(--danger);font-weight:800;">⛔ BANNED</span>' : ''}</div>
-        <div style="display:flex;gap:8px;margin-top:12px;">
-          <input type="number" id="searchAddBal" placeholder="Add amount" style="flex:1;">
-          <button class="btn btn-green btn-small" onclick="addBalance('${u.id}','${u.name||'User'}',true)"><i class="fas fa-plus"></i> Add</button>
-        </div>
-        <textarea id="searchMsgTxt" rows="2" placeholder="Message..." style="margin-top:8px;font-size:.82rem;"></textarea>
-        <button class="btn btn-small" style="width:100%;margin-top:6px;background:linear-gradient(135deg,#0984e3,#74b9ff);box-shadow:none;" onclick="sendSingleMsg('${u.id}','${u.name||'User'}',true)"><i class="fas fa-paper-plane"></i> Send Message</button>
-      </div>`;
-  }
 
-  async function addBalance(uid, name, fromSearch=false) {
-    const inputId = fromSearch ? 'searchAddBal' : 'addBal_'+uid;
-    const el = document.getElementById(inputId);
-    const amt = Number(el.value);
-    if(!amt || amt <= 0) return toast('Enter a valid amount');
-    const snap = await db.ref('users/'+uid).once('value');
-    if(!snap.exists()) return toast('User not found');
-    const u = snap.val();
-    await db.ref('users/'+uid).update({ balance:(u.balance||0)+amt, totalEarned:(u.totalEarned||0)+amt });
-    el.value = '';
-    toast(`✅ +${amt} added to ${name}`);
-    sendTgMsg(uid, `🎁 <b>Balance Added!</b>\n━━━━━━━━━━━━━━━━━\n<b>+${amt} ${configData.currencySymbol||'TK'}</b> আপনার একাউন্টে যোগ করা হয়েছে!\n\n<i>Admin কর্তৃক</i>`);
-  }
-
-  async function banUser(uid, name) {
-    showConfirm({ icon:'<i class="fas fa-ban"></i>', iconClass:'ic-red', title:'Ban User?', msg:`Are you sure you want to ban ${name}?`, btnLabel:'<i class="fas fa-ban"></i> Ban', btnClass:'btn-red', onConfirm: async () => { await db.ref('users/'+uid).update({ isBanned:true, banReason:'Banned by admin.' }); toast('🔒 User Banned'); } });
-  }
-
-  async function unbanUser(uid) {
-    await db.ref('users/'+uid).update({ isBanned:false, banReason:'' });
-    toast('✅ User Unbanned');
-  }
-
-  async function resetUser(uid, name) {
-    showConfirm({ icon:'<i class="fas fa-redo"></i>', iconClass:'ic-orange', title:'Reset Balance?', msg:`Reset ${name}'s balance to 0?`, btnLabel:'<i class="fas fa-redo"></i> Reset', btnClass:'btn-orange', onConfirm: async () => { await db.ref('users/'+uid).update({ balance:0 }); toast('✅ Balance Reset'); } });
-  }
-
-  async function sendSingleMsg(uid, name, fromSearch=false) {
-    if(!BOT_TOKEN){ toast('⚠️ Bot Token missing!'); return; }
-    const txtEl = fromSearch ? document.getElementById('searchMsgTxt') : document.getElementById('msgTxt_'+uid);
-    if(!txtEl) return;
-    const msg = txtEl.value.trim();
-    if(!msg) return toast('Type a message first');
-    const ok = await sendTgMsg(uid, msg);
-    toast(ok ? `✅ Message sent to ${name}!` : `❌ Failed. Check Bot Token.`);
-    txtEl.value = '';
-  }
-
-  async function sendBroadcast() {
-    const msg = document.getElementById('bcMessage').value.trim();
-    const statusEl = document.getElementById('bcStatus');
-    const btn = document.getElementById('bcBtn');
-    if(!msg) return toast('Enter a message');
-    if(!BOT_TOKEN){ statusEl.innerHTML = "<span style='color:var(--danger);'>⚠️ Bot Token missing.</span>"; return; }
-    const uids = Object.keys(allUsersCache);
-    if(!uids.length) return (statusEl.innerHTML='No users in database.');
-    btn.disabled = true; btn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> Sending...";
-    statusEl.style.color = '#fff'; statusEl.innerText = `Sending to ${uids.length} users...`;
-    let success=0, failed=0;
-    for(let i=0;i<uids.length;i++){ const ok = await sendTgMsg(uids[i], msg); if(ok) success++; else failed++; await new Promise(r=>setTimeout(r,110)); }
-    btn.disabled = false; btn.innerHTML = "<i class='fas fa-paper-plane'></i> Send to All Users";
-    document.getElementById('bcMessage').value = '';
-    statusEl.innerHTML = `<span style="color:var(--success)">✅ Done!</span><br>Sent: <b>${success}</b> | Failed: <b style="color:var(--danger);">${failed}</b>`;
-  }
-
-  function loadChannelSettings() {
-    const cfg = configData;
-    const channels = cfg.requiredChannels || [];
-    for(let i=1;i<=5;i++){
-      const ch = channels[i-1] || {};
-      const uEl = document.getElementById('ch'+i+'Username');
-      const nEl = document.getElementById('ch'+i+'Name');
-      if(uEl) uEl.value = ch.username || '';
-      if(nEl) nEl.value = ch.name || '';
+    if(snap.exists()){
+      snap.forEach(child => {
+        let item = child.val();
+        let key = child.key;
+        let date = new Date(item.timestamp).toLocaleString();
+        
+        let typeIcon = 'fa-envelope'; 
+        let typeLabel = item.type;
+        if(item.type==='gmail'){ typeIcon='fab fa-google'; typeLabel='Gmail'; }
+        else if(item.type==='instagram'){ typeIcon='fab fa-instagram'; typeLabel='Instagram'; }
+        else if(item.type==='facebook'){ typeIcon='fab fa-facebook'; typeLabel='Facebook'; }
+        else if(item.type==='tiktok'){ typeIcon='fab fa-tiktok'; typeLabel='TikTok'; }
+        else if(item.type==='telegram'){ typeIcon='fab fa-telegram-plane'; typeLabel='Telegram'; }
+        else if(item.type==='whatsapp'){ typeIcon='fab fa-whatsapp'; typeLabel='WhatsApp'; }
+        
+        let dataStr = '';
+        
+        // ROBUST DATA DISPLAY LOGIC
+        if(item.type==='gmail') dataStr=`Email: ${item.email||'—'}<br>Password: ${item.password||'—'}${item.recovery?'<br>Recovery: '+item.recovery:''}`;
+        else if(item.type==='instagram') dataStr=`Username: ${item.username||'—'}<br>Password: ${item.password||'—'}<br>Followers: ${item.followers||'0'}`;
+        else if(item.type==='facebook') dataStr=`Email/User: ${item.email||item.username||'—'}<br>Password: ${item.password||'—'}<br>Friends: ${item.friends||'0'}`;
+        else if(item.type==='tiktok') dataStr=`Username: ${item.username||'—'}<br>Password: ${item.password||'—'}<br>Followers: ${item.followers||'0'}`;
+        else if(item.type==='telegram') {
+           dataStr = `Username: ${item.username||'—'}<br>`;
+           if(item.number) dataStr+= `Number: ${item.number}<br>`;
+           dataStr+= `Password/2FA: ${item.password||'—'}`;
+        }
+        else if(item.type==='whatsapp') {
+           dataStr = `Number: ${item.number||item.phone||'—'}<br>`;
+           if(item.accountType) dataStr+= `Type: ${item.accountType} Account<br>`;
+           dataStr+= `Note: ${item.note||item.password||'—'}`;
+        }
+        else dataStr = Object.keys(item).filter(k=>!['key','type','status','timestamp','userId','userName'].includes(k)).map(k=>`${k}: ${item[k]}`).join('<br>') || '—';
+        
+        const price = getItemPrice(item.type);
+        
+        html += `
+        <div class="sell-sub-card">
+          <div class="sell-sub-head">
+            <span class="badge-type"><i class="${typeIcon}"></i> ${typeLabel}</span>
+            <span class="badge-price">${price>0 ? price+' '+cur : 'Free'}</span>
+          </div>
+          <div class="sell-sub-info">
+            <b style="color:#fff;">User:</b> ${item.userName||'—'} <span style="color:var(--text-muted);">(ID: ${item.userId})</span><br>
+            <b style="color:#fff;">Time:</b> ${date}<br>
+            <div style="margin-top:6px; background:rgba(0,0,0,.2); padding:8px; border-radius:8px;">${dataStr}</div>
+          </div>
+          <div class="sell-sub-actions">
+            <button class="btn btn-green btn-small" onclick="markSellDone('${key}','${item.userId}','${item.type}','${item.userName||'User'}')"><i class="fas fa-check"></i> Approve</button>
+            <button class="btn btn-red btn-small" onclick="rejectSellSub('${key}','${item.userId}','${item.type}','${item.userName||'User'}')"><i class="fas fa-times"></i> Reject</button>
+          </div>
+        </div>`;
+      });
     }
-    const vt = document.getElementById('botVerifyToken'); if(vt) vt.value = cfg.botVerifyToken || '';
-    const bn = document.getElementById('botName'); if(bn) bn.value = cfg.botName || '';
-    const we = document.getElementById('withdrawEnabled'); if(we) we.checked = cfg.withdrawEnabled !== false;
-  }
-
-  async function saveChannelSettings() {
-    const channels = [];
-    for(let i=1;i<=5;i++){
-      const u = (document.getElementById('ch'+i+'Username').value||'').trim();
-      const n = (document.getElementById('ch'+i+'Name').value||'').trim();
-      if(u) channels.push({ username:u, name:n });
-    }
-    const botVerifyToken = (document.getElementById('botVerifyToken').value||'').trim();
-    const botName = (document.getElementById('botName').value||'').trim();
-    await db.ref('config').update({ requiredChannels:channels, botVerifyToken, botName });
-    toast('✅ Channel settings saved!');
-  }
-
-  async function saveWithdrawControl() {
-    const enabled = document.getElementById('withdrawEnabled').checked;
-    await db.ref('config').update({ withdrawEnabled:enabled });
-    toast(enabled ? '✅ উত্তোলন চালু!' : '🔒 উত্তোলন বন্ধ!');
-  }
-
-  // ===== SELL SETTINGS (4 ITEMS) =====
-  function loadSellSettings() {
-    const sale = configData.saleSettings || {};
-    const items = ['gmail','insta','fb','tiktok'];
-    items.forEach(key => {
-      const enEl = document.getElementById(key+'Enabled');
-      const prEl = document.getElementById(key+'Price');
-      if(enEl) enEl.checked = sale[key+'Enabled'] !== false;
-      if(prEl) prEl.value = sale[key+'Price'] || '';
-    });
-  }
-
-  async function saveSellSettings() {
-    const saleData = {
-      gmailEnabled: document.getElementById('gmailEnabled').checked,
-      gmailPrice: Number(document.getElementById('gmailPrice').value||0),
-      instaEnabled: document.getElementById('instaEnabled').checked,
-      instaPrice: Number(document.getElementById('instaPrice').value||0),
-      fbEnabled: document.getElementById('fbEnabled').checked,
-      fbPrice: Number(document.getElementById('fbPrice').value||0),
-      tiktokEnabled: document.getElementById('tiktokEnabled').checked,
-      tiktokPrice: Number(document.getElementById('tiktokPrice').value||0),
-    };
-    await db.ref('config/saleSettings').set(saleData);
-    toast('✅ Sale settings saved!');
-  }
-
-  async function loadSellSubmissions(filter='pending') {
-    const el = document.getElementById('sellSubContainer');
-    el.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:20px;"><i class="fas fa-spinner fa-spin"></i></div>';
-    const snap = await db.ref('sellSubmissions').orderByChild('timestamp').limitToLast(80).once('value');
-    if(!snap.exists()){ el.innerHTML='<p style="text-align:center;color:var(--text-muted);padding:20px;">No submissions yet.</p>'; return; }
-    let items = [];
-    snap.forEach(c => items.push({key:c.key,...c.val()}));
-    items.reverse();
-    if(filter !== 'all') items = items.filter(i => i.status === filter);
-    if(!items.length){ el.innerHTML='<p style="text-align:center;color:var(--text-muted);padding:16px;">No items found.</p>'; return; }
-    const cur = configData.currencySymbol || 'TK';
-    let html = '';
-    items.forEach(item => {
-      const d = new Date(item.timestamp).toLocaleString('en-GB');
-      const stClass = item.status==='done' ? 'done' : 'pending';
-      const stLabel = item.status==='done' ? '✅ Done' : '⏳ Pending';
-      let typeIcon = 'fa-envelope'; let typeLabel = item.type;
-      if(item.type==='gmail'){ typeIcon='fab fa-google'; typeLabel='Gmail'; }
-      else if(item.type==='instagram'){ typeIcon='fab fa-instagram'; typeLabel='Instagram'; }
-      else if(item.type==='facebook'){ typeIcon='fab fa-facebook'; typeLabel='Facebook'; }
-      else if(item.type==='tiktok'){ typeIcon='fab fa-tiktok'; typeLabel='TikTok'; }
-      let dataStr = '';
-      if(item.type==='gmail') dataStr=`Email: ${item.email||'—'}<br>Password: ${item.password||'—'}${item.recovery?'<br>Recovery: '+item.recovery:''}`;
-      else if(item.type==='instagram') dataStr=`Username: ${item.username||'—'}<br>Password: ${item.password||'—'}<br>Followers: ${item.followers||'0'}`;
-      else if(item.type==='facebook') dataStr=`Email/User: ${item.email||item.username||'—'}<br>Password: ${item.password||'—'}<br>Friends: ${item.friends||'0'}`;
-      else if(item.type==='tiktok') dataStr=`Username: ${item.username||'—'}<br>Password: ${item.password||'—'}<br>Followers: ${item.followers||'0'}`;
-      const price = getItemPrice(item.type);
-      html += `
-      <div class="sell-sub-item">
-        <div class="sell-sub-head">
-          <span class="sell-sub-type"><i class="${typeIcon}"></i> ${typeLabel} — <span style="color:#fff;">${item.userName||'User'}</span> <span style="color:var(--text-muted);font-size:.75rem;">(${item.userId})</span></span>
-          <span class="sell-sub-status ${stClass}">${stLabel}</span>
-        </div>
-        <div class="sell-sub-data">${dataStr}<br><small style="color:var(--text-muted);">${d}</small></div>
-        ${price>0 ? `<div style="font-size:.8rem;font-weight:700;color:var(--success);margin-bottom:8px;">💰 Payment: ${price} ${cur}</div>` : ''}
-        <div class="sell-sub-actions">
-          ${item.status!=='done' ? `<button class="btn btn-green btn-small" onclick="markSellDone('${item.key}','${item.userId}','${item.type}')"><i class="fas fa-check"></i> Approve &amp; Pay</button>` : ''}
-          <button class="btn btn-red btn-small" onclick="deleteSellSub('${item.key}')"><i class="fas fa-trash"></i></button>
-        </div>
-      </div>`;
-    });
-    el.innerHTML = html;
-  }
+    document.getElementById('sellSubContainer').innerHTML = html || '<p style="text-align:center;color:var(--text-muted);padding:20px;">No pending sell requests.</p>';
+  });
 
   function getItemPrice(type) {
     const sale = configData.saleSettings || {};
@@ -1028,31 +1027,82 @@
     if(type==='instagram') return Number(sale.instaPrice||0);
     if(type==='facebook') return Number(sale.fbPrice||0);
     if(type==='tiktok') return Number(sale.tiktokPrice||0);
+    if(type==='telegram') return Number(sale.telegramPrice||0);
+    if(type==='whatsapp') return Number(sale.whatsappPrice||0);
     return 0;
   }
 
-  async function markSellDone(key, userId, type) {
+  const TYPE_LABELS = {gmail:'Gmail',instagram:'Instagram',facebook:'Facebook',tiktok:'TikTok',telegram:'Telegram',whatsapp:'WhatsApp'};
+
+  async function markSellDone(key, userId, type, userName) {
     const price = getItemPrice(type);
-    const typeLabels = {gmail:'Gmail',instagram:'Instagram',facebook:'Facebook',tiktok:'TikTok'};
-    const typeLabel = typeLabels[type] || type;
-    await db.ref('sellSubmissions/'+key).update({ status:'done' });
-    if(price > 0) {
-      const snap = await db.ref('users/'+userId).once('value');
-      if(snap.exists()){
-        const u = snap.val();
-        await db.ref('users/'+userId).update({ balance:(u.balance||0)+price, totalEarned:(u.totalEarned||0)+price });
-        sendTgMsg(userId, `✅ <b>SELL APPROVED!</b>\n━━━━━━━━━━━━━━━━━━━━━\nআপনার <b>${typeLabel}</b> একাউন্ট অ্যাডমিন অ্যাপ্রুভ করেছেন।\n\n💰 <b>পেমেন্ট: +${price} ${configData.currencySymbol||'TK'}</b>\nআপনার ব্যালেন্সে যোগ হয়েছে!\n\n<i>TaskHive EarnCash Pro</i>`);
+    const typeLabel = TYPE_LABELS[type] || type;
+    const cur = configData.currencySymbol||'TK';
+    showConfirm({
+      icon:'<i class="fas fa-check-circle"></i>', iconClass:'ic-green',
+      title:'Approve Submission?', amtBadge: price>0 ? `${price} ${cur}` : null,
+      msg:`Approve ${userName}'s ${typeLabel} account${price>0?' and pay '+price+' '+cur:''}?`,
+      btnLabel:'<i class="fas fa-check"></i> Approve', btnClass:'btn-green',
+      onConfirm: async () => {
+        await db.ref('sellSubmissions/'+key).update({ status:'done', reviewedAt:Date.now() });
+        if(price > 0) {
+          const snap = await db.ref('users/'+userId).once('value');
+          if(snap.exists()){
+            const u = snap.val();
+            await db.ref('users/'+userId).update({ balance:(u.balance||0)+price, totalEarned:(u.totalEarned||0)+price });
+            sendTgMsg(userId, notifyApproved({
+              title:'একাউন্ট সেল সফল হয়েছে!',
+              lines:[
+                `অভিনন্দন <b>${userName}</b>! আপনার সাবমিট করা <b>${typeLabel}</b> একাউন্টটি যাচাই করে অনুমোদন করা হয়েছে এবং পেমেন্ট পাঠানো হয়েছে। 🎉`,
+                ``,
+                `🗂️ <b>আইটেম:</b> ${typeLabel}`,
+                `💰 <b>পেমেন্ট:</b> +${price} ${cur}`,
+                `📊 <b>নতুন ব্যালেন্স:</b> ${((u.balance||0)+price).toFixed(2)} ${cur}`,
+                `📌 <b>স্ট্যাটাস:</b> ✅ Approved & Paid`,
+                ``,
+                `আপনি যদি আরও একাউন্ট সেল করতে চান, তবে আজই সাবমিট করুন। দ্রুত সেল করে বেশি আয় করুন! 💸`
+              ]
+            }));
+          }
+        } else {
+          sendTgMsg(userId, notifyApproved({
+            title:'একাউন্ট অ্যাপ্রুভড!',
+            lines:[
+              `প্রিয় <b>${userName}</b>, আপনার <b>${typeLabel}</b> একাউন্টটি অনুমোদন করা হয়েছে। ✅`,
+              ``,
+              `📌 <b>স্ট্যাটাস:</b> Approved`
+            ]
+          }));
+        }
+        toast('✅ Approved' + (price ? ' & +'+price+' paid!' : ''));
       }
-    }
-    toast('✅ Approved' + (price ? ' & +'+price+' paid!' : ''));
-    loadSellSubmissions('all');
+    });
   }
 
-  async function deleteSellSub(key) {
-    if(!confirm('Delete this submission?')) return;
-    await db.ref('sellSubmissions/'+key).remove();
-    toast('🗑️ Deleted');
-    loadSellSubmissions('all');
+  async function rejectSellSub(key, userId, type, userName) {
+    const typeLabel = TYPE_LABELS[type] || type;
+    showConfirm({
+      icon:'<i class="fas fa-times-circle"></i>', iconClass:'ic-red',
+      title:'Reject Submission?',
+      msg:`Reject ${userName}'s ${typeLabel} account submission?`,
+      btnLabel:'<i class="fas fa-times"></i> Reject', btnClass:'btn-red',
+      onConfirm: async () => {
+        await db.ref('sellSubmissions/'+key).update({ status:'rejected', reviewedAt:Date.now() });
+        sendTgMsg(userId, notifyRejected({
+          title:'একাউন্ট বাতিল হয়েছে',
+          lines:[
+            `প্রিয় <b>${userName}</b>, দুঃখিত জানাচ্ছি — আপনার সাবমিট করা <b>${typeLabel}</b> একাউন্টটি আমাদের যাচাইয় পার্যন্ত সঠিক পাওয়া যায়নি।`,
+            ``,
+            `🗂️ <b>আইটেম:</b> ${typeLabel}`,
+            `📌 <b>স্ট্যাটাস:</b> ❌ Rejected`,
+            ``,
+            `সম্ভাব্য কারণ: ভুল তথ্য, অগোছানো একাউন্ট বা পূর্বে বিক্রি করা হয়েছে।`,
+            `আপনি সঠিক তথ্য দিয়ে আবার চেষ্টা করতে পারেন।`
+          ]
+        }));
+        toast('❌ Submission Rejected');
+      }
+    });
   }
 
   // ===== PROMO CODES =====
@@ -1151,6 +1201,295 @@
       });
       el.innerHTML = html;
     });
+  }
+
+  function loadChannelSettings() {
+    const cfg = configData;
+    const channels = cfg.requiredChannels || [];
+    for(let i=1;i<=5;i++){
+      const ch = channels[i-1] || {};
+      const uEl = document.getElementById('ch'+i+'Username');
+      const nEl = document.getElementById('ch'+i+'Name');
+      if(uEl) uEl.value = ch.username || '';
+      if(nEl) nEl.value = ch.name || '';
+    }
+    const vt = document.getElementById('botVerifyToken'); if(vt) vt.value = cfg.botVerifyToken || '';
+    const bn = document.getElementById('botName'); if(bn) bn.value = cfg.botName || '';
+    const we = document.getElementById('withdrawEnabled'); if(we) we.checked = cfg.withdrawEnabled !== false;
+  }
+
+  async function saveChannelSettings() {
+    const channels = [];
+    for(let i=1;i<=5;i++){
+      const u = (document.getElementById('ch'+i+'Username').value||'').trim();
+      const n = (document.getElementById('ch'+i+'Name').value||'').trim();
+      if(u) channels.push({ username:u, name:n });
+    }
+    const botVerifyToken = (document.getElementById('botVerifyToken').value||'').trim();
+    const botName = (document.getElementById('botName').value||'').trim();
+    await db.ref('config').update({ requiredChannels:channels, botVerifyToken, botName });
+    toast('✅ Channel settings saved!');
+  }
+
+  async function saveWithdrawControl() {
+    const enabled = document.getElementById('withdrawEnabled').checked;
+    await db.ref('config').update({ withdrawEnabled:enabled });
+    toast(enabled ? '✅ উত্তোলন চালু!' : '🔒 উত্তোলন বন্ধ!');
+  }
+
+  function loadSellSettings() {
+    const sale = configData.saleSettings || {};
+    const items = ['gmail','insta','fb','tiktok','telegram','whatsapp'];
+    items.forEach(key => {
+      const enEl = document.getElementById(key+'Enabled');
+      const prEl = document.getElementById(key+'Price');
+      if(enEl) enEl.checked = sale[key+'Enabled'] !== false;
+      if(prEl) prEl.value = sale[key+'Price'] || '';
+    });
+  }
+
+  async function saveSellSettings() {
+    const saleData = {
+      gmailEnabled: document.getElementById('gmailEnabled').checked,
+      gmailPrice: Number(document.getElementById('gmailPrice').value||0),
+      instaEnabled: document.getElementById('instaEnabled').checked,
+      instaPrice: Number(document.getElementById('instaPrice').value||0),
+      fbEnabled: document.getElementById('fbEnabled').checked,
+      fbPrice: Number(document.getElementById('fbPrice').value||0),
+      tiktokEnabled: document.getElementById('tiktokEnabled').checked,
+      tiktokPrice: Number(document.getElementById('tiktokPrice').value||0),
+      telegramEnabled: document.getElementById('telegramEnabled').checked,
+      telegramPrice: Number(document.getElementById('telegramPrice').value||0),
+      whatsappEnabled: document.getElementById('whatsappEnabled').checked,
+      whatsappPrice: Number(document.getElementById('whatsappPrice').value||0),
+    };
+    await db.ref('config/saleSettings').set(saleData);
+    toast('✅ Sale settings saved!');
+  }
+
+  function renderUsersList() {
+    const el = document.getElementById('usersList');
+    const msg = document.getElementById('usersLoadingMsg');
+    const cur = configData.currencySymbol || 'TK';
+    const users = Object.values(allUsersCache);
+    if(!users.length){ msg.style.display='block'; msg.innerHTML='No users found.'; return; }
+    msg.style.display='none';
+    let html = '';
+    users.slice(0,50).forEach(u => {
+      const initial = (u.name||'?')[0].toUpperCase();
+      html += `
+      <div class="user-list-item">
+        <div class="user-list-head">
+          <div class="user-avatar">${initial}</div>
+          <div><div class="user-list-name">${u.name||'Unknown'}</div><div class="user-list-id">ID: ${u.id}</div></div>
+          ${u.isBanned ? '<span style="background:rgba(255,71,87,.2);color:var(--danger);font-size:.72rem;font-weight:800;padding:3px 10px;border-radius:99px;margin-left:auto;">BANNED</span>' : ''}
+        </div>
+        <div class="user-stats-row">
+          <div class="user-stat-chip"><div class="chip-val">${(u.balance||0).toFixed(1)}</div><div>${cur}</div></div>
+          <div class="user-stat-chip"><div class="chip-val">${u.referrals||0}</div><div>Refs</div></div>
+          <div class="user-stat-chip"><div class="chip-val">${(u.totalEarned||0).toFixed(1)}</div><div>Earned</div></div>
+          <div class="user-stat-chip"><div class="chip-val">${(u.totalWithdrawn||0).toFixed(1)}</div><div>Withdrawn</div></div>
+        </div>
+        <div class="user-actions-area">
+          <div class="user-action-row">
+            <input type="number" id="balInput_${u.id}" placeholder="Amount" style="flex:1;">
+            <button class="btn btn-green btn-small" onclick="addBalance('${u.id}','${u.name||'User'}')"><i class="fas fa-plus"></i> Add</button>
+            <button class="btn btn-orange btn-small" onclick="deductBalance('${u.id}','${u.name||'User'}')"><i class="fas fa-minus"></i> Cut</button>
+          </div>
+          <div class="user-action-row">
+            ${u.isBanned
+              ? `<button class="btn btn-green btn-small" style="flex:1;" onclick="unbanUser('${u.id}','${u.name||'User'}')"><i class="fas fa-unlock"></i> Unban</button>`
+              : `<button class="btn btn-red btn-small" style="flex:1;" onclick="banUser('${u.id}','${u.name||'User'}')"><i class="fas fa-ban"></i> Ban</button>`
+            }
+            <button class="btn btn-small" style="flex:1;background:rgba(255,255,255,.08);box-shadow:none;" onclick="resetUser('${u.id}','${u.name||'User'}')"><i class="fas fa-redo"></i> Reset</button>
+          </div>
+          <textarea id="msgTxt_${u.id}" rows="2" placeholder="Message to user..." style="margin-top:8px;font-size:.82rem;"></textarea>
+          <button class="btn btn-small" style="width:100%;margin-top:6px;background:linear-gradient(135deg,#0984e3,#74b9ff);box-shadow:none;" onclick="sendSingleMsg('${u.id}','${u.name||'User'}')"><i class="fas fa-paper-plane"></i> Send Message</button>
+        </div>
+      </div>`;
+    });
+    el.innerHTML = html;
+  }
+
+  function searchUser() {
+    const uid = document.getElementById('searchUid').value.trim();
+    const box = document.getElementById('userResultBox');
+    if(!uid) return toast('Enter a User ID');
+    const u = allUsersCache[uid];
+    if(!u){ box.style.display='block'; box.innerHTML='<p style="color:var(--danger);text-align:center;padding:10px;">User not found.</p>'; return; }
+    const cur = configData.currencySymbol || 'TK';
+    box.style.display='block';
+    box.innerHTML = `
+      <div style="border:1px solid var(--border);border-radius:14px;padding:14px;margin-top:10px;">
+        <div style="font-weight:800;font-size:1rem;color:#fff;margin-bottom:8px;">${u.name||'Unknown'} <span style="color:var(--text-muted);font-weight:600;font-size:.8rem;">(${u.id})</span></div>
+        <div style="font-size:.82rem;color:var(--text-muted);line-height:1.8;">Balance: <b style="color:var(--success);">${(u.balance||0).toFixed(2)} ${cur}</b><br>Earned: ${(u.totalEarned||0).toFixed(2)} ${cur}<br>Referrals: ${u.referrals||0}<br>Withdrawn: ${(u.totalWithdrawn||0).toFixed(2)} ${cur}${u.isBanned ? '<br><span style="color:var(--danger);font-weight:800;">⛔ BANNED</span>' : ''}</div>
+        <div style="display:flex;gap:8px;margin-top:12px;">
+          <input type="number" id="searchBalInput" placeholder="Amount" style="flex:1;">
+          <button class="btn btn-green btn-small" onclick="addBalance('${u.id}','${u.name||'User'}',true)"><i class="fas fa-plus"></i> Add</button>
+          <button class="btn btn-orange btn-small" onclick="deductBalance('${u.id}','${u.name||'User'}',true)"><i class="fas fa-minus"></i> Cut</button>
+        </div>
+        <textarea id="searchMsgTxt" rows="2" placeholder="Message..." style="margin-top:8px;font-size:.82rem;"></textarea>
+        <button class="btn btn-small" style="width:100%;margin-top:6px;background:linear-gradient(135deg,#0984e3,#74b9ff);box-shadow:none;" onclick="sendSingleMsg('${u.id}','${u.name||'User'}',true)"><i class="fas fa-paper-plane"></i> Send Message</button>
+      </div>`;
+  }
+
+  async function addBalance(uid, name, fromSearch=false) {
+    const inputId = fromSearch ? 'searchBalInput' : 'balInput_'+uid;
+    const el = document.getElementById(inputId);
+    const amt = Number(el.value);
+    if(!amt || amt <= 0) return toast('Enter a valid amount');
+    const snap = await db.ref('users/'+uid).once('value');
+    if(!snap.exists()) return toast('User not found');
+    const u = snap.val();
+    await db.ref('users/'+uid).update({ balance:(u.balance||0)+amt, totalEarned:(u.totalEarned||0)+amt });
+    el.value = '';
+    toast(`✅ +${amt} added to ${name}`);
+    sendTgMsg(uid, notifyInfo({
+      emoji:'🎁', title:'বোনাস প্রাপ্ত!',
+      lines:[
+        `প্রিয় <b>${name}</b>, অ্যাডমিন আপনার ওয়ালেটে বোনাস ব্যালেন্স যোগ করেছেন।`,
+        ``,
+        `💰 <b>যোগকৃত পরিমাণ:</b> +${amt} ${configData.currencySymbol||'TK'}`,
+        `📊 <b>নতুন ব্যালেন্স:</b> ${((u.balance||0)+amt).toFixed(2)} ${configData.currencySymbol||'TK'}`,
+        ``,
+        `আপনি এখন আরও কাজ করে আয় বাড়াতে পারেন। ধন্যবাদ!`
+      ]
+    }));
+  }
+
+  // DEDUCT BALANCE FUNCTION
+  async function deductBalance(uid, name, fromSearch=false) {
+    const inputId = fromSearch ? 'searchBalInput' : 'balInput_'+uid;
+    const el = document.getElementById(inputId);
+    const amt = Number(el.value);
+    if(!amt || amt <= 0) return toast('Enter a valid amount');
+    
+    const snap = await db.ref('users/'+uid).once('value');
+    if(!snap.exists()) return toast('User not found');
+    const u = snap.val();
+    
+    const currentBal = u.balance || 0;
+    if(currentBal < amt) return toast('⚠️ Insufficient balance!');
+
+    // Update balance but NOT totalEarned (deduction is separate from earning history usually)
+    await db.ref('users/'+uid).update({ balance: currentBal - amt });
+    
+    el.value = '';
+    toast(`✅ -${amt} deducted from ${name}`);
+    
+    sendTgMsg(uid, notifyInfo({
+      emoji:'⚠️', title:'ব্যালেন্স সমন্বয় করা হয়েছে',
+      lines:[
+        `প্রিয় <b>${name}</b>, অ্যাডমিন আপনার একাউন্ট থেকে ব্যালেন্স কমিয়েছেন।`,
+        ``,
+        `📉 <b>কাটা পরিমাণ:</b> -${amt} ${configData.currencySymbol||'TK'}`,
+        `📊 <b>নতুন ব্যালেন্স:</b> ${(currentBal - amt).toFixed(2)} ${configData.currencySymbol||'TK'}`,
+        ``,
+        `বিস্তারিত জানতে সাপোর্টে যোগাযোগ করুন।`
+      ]
+    }));
+  }
+
+  async function banUser(uid, name) {
+    showConfirm({ 
+      icon:'<i class="fas fa-ban"></i>', iconClass:'ic-red', 
+      title:'Ban User?', msg:`Are you sure you want to ban ${name}?`, 
+      btnLabel:'<i class="fas fa-ban"></i> Ban', btnClass:'btn-red', 
+      onConfirm: async () => { 
+        await db.ref('users/'+uid).update({ isBanned:true, banReason:'Banned by admin.' }); 
+        toast('🔒 User Banned');
+        sendTgMsg(uid, notifyInfo({
+          emoji:'🚫', title:'একাউন্ট সাসপেন্ড করা হয়েছে',
+          lines:[
+            `প্রিয় <b>${name}</b>, আমাদের নিয়ম ভঙ্গের কারণে আপনার একাউন্টটি সাময়িকভাবে সাসপেন্ড করা হয়েছে।`,
+            ``,
+            `আপনি এখন আর কোনো কাজ বা উত্তোলন করতে পারবেন না।`,
+            ``,
+            `বিস্তারিত জানতে সাপোর্টে যোগাযোগ করুন।`
+          ]
+        }));
+      } 
+    });
+  }
+
+  async function unbanUser(uid, name) {
+    await db.ref('users/'+uid).update({ isBanned:false, banReason:'' });
+    toast('✅ User Unbanned');
+    sendTgMsg(uid, notifyInfo({
+      emoji:'🔓', title:'একাউন্ট সচল করা হয়েছে',
+      lines:[
+        `প্রিয় <b>${name}</b>, আপনার একাউন্টের নিষেধাজ্ঞা প্রত্যাহার করা হয়েছে।`,
+        ``,
+        `আপনি এখন আবার স্বাভাবিকভাবে আমাদের অ্যাপে কাজ করতে পারবেন।`,
+        ``,
+        `ধন্যবাদ আমাদের সাথে থাকার জন্য।`
+      ]
+    }));
+  }
+
+  async function resetUser(uid, name) {
+    showConfirm({ icon:'<i class="fas fa-redo"></i>', iconClass:'ic-orange', title:'Reset Balance?', msg:`Reset ${name}'s balance to 0?`, btnLabel:'<i class="fas fa-redo"></i> Reset', btnClass:'btn-orange', onConfirm: async () => { await db.ref('users/'+uid).update({ balance:0 }); toast('✅ Balance Reset'); } });
+  }
+
+  async function sendSingleMsg(uid, name, fromSearch=false) {
+    if(!BOT_TOKEN){ toast('⚠️ Bot Token missing!'); return; }
+    const txtEl = fromSearch ? document.getElementById('searchMsgTxt') : document.getElementById('msgTxt_'+uid);
+    if(!txtEl) return;
+    const msg = txtEl.value.trim();
+    if(!msg) return toast('Type a message first');
+    const ok = await sendTgMsg(uid, notifyInfo({ emoji:'📩', title:'অ্যাডমিন বার্তা', lines:[ msg ] }));
+    toast(ok ? `✅ Message sent to ${name}!` : `❌ Failed. Check Bot Token.`);
+    txtEl.value = '';
+  }
+
+  async function sendBroadcast() {
+    const msg = document.getElementById('bcMessage').value.trim();
+    const statusEl = document.getElementById('bcStatus');
+    const btn = document.getElementById('bcBtn');
+    if(!msg) return toast('Enter a message');
+    if(!BOT_TOKEN){ statusEl.innerHTML = "<span style='color:var(--danger);'>⚠️ Bot Token missing.</span>"; return; }
+    const uids = Object.keys(allUsersCache);
+    if(!uids.length) return (statusEl.innerHTML='No users in database.');
+    btn.disabled = true; btn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> Sending...";
+    statusEl.style.color = '#fff'; statusEl.innerText = `Sending to ${uids.length} users...`;
+    const finalMsg = notifyInfo({ emoji:'📢', title:'গুরুত্বপূর্ণ ঘোষণা', lines:[ msg ] });
+    let success=0, failed=0;
+    for(let i=0;i<uids.length;i++){ const ok = await sendTgMsg(uids[i], finalMsg); if(ok) success++; else failed++; await new Promise(r=>setTimeout(r,110)); }
+    btn.disabled = false; btn.innerHTML = "<i class='fas fa-paper-plane'></i> Send to All Users";
+    document.getElementById('bcMessage').value = '';
+    statusEl.innerHTML = `<span style="color:var(--success)">✅ Done!</span><br>Sent: <b>${success}</b> | Failed: <b style="color:var(--danger);">${failed}</b>`;
+  }
+
+  // PAYMENT COMPLETED BROADCAST
+  async function sendPaymentCompleteMsg() {
+    if(!confirm('Send "Payments Completed" notice to all users?')) return;
+    const statusEl = document.getElementById('bcStatus');
+    if(!BOT_TOKEN) return toast('⚠️ Bot Token missing.');
+    
+    const uids = Object.keys(allUsersCache);
+    const cur = configData.currencySymbol || 'TK';
+    
+    toast('📡 Sending Broadcast...');
+    const msg = notifyInfo({
+      emoji:'✅', title:'পেমেন্ট সম্পন্ন হয়েছে',
+      lines:[
+        `সবাইকে জানানো যাচ্ছে যে, আমাদের পেমেন্ট প্রসেসিং টিম সফলভাবে সকল পেন্ডিং পেমেন্ট প্রসেস করে ফেলেছে।`,
+        ``,
+        `যাদের পেমেন্ট আমাদের নিয়ম অনুযায়ী পেন্ডিং ছিল, তারা তাদের একাউন্ট চেক করুন।`,
+        ``,
+        `যারা এখনো মিনিমাম লিমিটে পৌঁছাননি, তারা নিয়মিত কাজ করে দ্রুত পেমেন্ট রিকোয়েস্ট করুন।`,
+        ``,
+        `সততার সাথে কাজ চালিয়ে যান। 🐝 <b>${APP_NAME}</b>`
+      ]
+    });
+
+    let success=0, failed=0;
+    for(let i=0;i<uids.length;i++){ 
+      const ok = await sendTgMsg(uids[i], msg); 
+      if(ok) success++; else failed++; 
+      await new Promise(r=>setTimeout(r,110)); 
+    }
+    toast(`📢 Sent to ${success} users`);
   }
 </script>
 </body>
